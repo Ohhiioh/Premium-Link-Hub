@@ -35,7 +35,6 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        /* Animation for auto-add toast */
         @keyframes slideUp {
             from { transform: translateY(100%); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
@@ -61,16 +60,22 @@
             </div>
             
             <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                <!-- Bookmarklet Button -->
-                <a id="bookmarkletLink" href="#" class="hidden md:flex items-center gap-2 px-4 py-4 rounded-2xl bg-white border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 transition-all cursor-move shadow-sm" title="ลากปุ่มนี้ไปไว้ที่แถบบุ๊กมาร์ก (Bookmarks Bar)">
+                <!-- Desktop Bookmarklet -->
+                <a id="bookmarkletLink" href="#" class="hidden lg:flex items-center gap-2 px-4 py-4 rounded-2xl bg-white border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 transition-all cursor-move shadow-sm" title="ลากปุ่มนี้ไปไว้ที่แถบบุ๊กมาร์ก (Bookmarks Bar)">
                     <i data-lucide="bookmark"></i>
-                    ลากเพื่อติดตั้งปุ่มลัด
+                    ลากปุ่มลัด (PC)
                 </a>
+
+                <!-- Mobile Quick Add Info -->
+                <button onclick="showMobileGuide()" class="flex lg:hidden items-center gap-2 px-4 py-4 rounded-2xl bg-white border border-slate-200 text-slate-600 text-xs font-bold shadow-sm">
+                    <i data-lucide="smartphone"></i>
+                    วิธีใช้บนมือถือ
+                </button>
 
                 <div class="relative flex-1 md:w-64">
                     <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4"></i>
                     <input type="text" id="searchInput" placeholder="ค้นหาลิงก์..." 
-                        class="w-full pl-12 pr-4 py-4 rounded-2xl glass-panel border-none shadow-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                        class="w-full pl-12 pr-4 py-4 rounded-2xl glass-panel border-none shadow-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm">
                 </div>
                 <button onclick="toggleAddForm()" class="p-4 bg-slate-900 text-white rounded-2xl hover:bg-blue-600 transition-colors shadow-lg">
                     <i data-lucide="plus" id="addIcon"></i>
@@ -85,12 +90,12 @@
                     <div class="md:col-span-4 space-y-2">
                         <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">ชื่อเว็บไซต์</label>
                         <input type="text" id="siteTitle" placeholder="เช่น Streaming, Gmail" required
-                            class="w-full p-4 rounded-2xl bg-white/50 border border-slate-100 outline-none focus:bg-white transition-all">
+                            class="w-full p-4 rounded-2xl bg-white/50 border border-slate-100 outline-none focus:bg-white transition-all text-sm">
                     </div>
                     <div class="md:col-span-6 space-y-2">
                         <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">URL (ลิงก์)</label>
                         <input type="text" id="siteUrl" placeholder="https://..." required
-                            class="w-full p-4 rounded-2xl bg-white/50 border border-slate-100 outline-none focus:bg-white transition-all">
+                            class="w-full p-4 rounded-2xl bg-white/50 border border-slate-100 outline-none focus:bg-white transition-all text-sm">
                     </div>
                     <div class="md:col-span-2 flex items-end">
                         <button type="submit" class="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl shadow-lg hover:scale-[1.02] active:scale-95 transition-all">
@@ -102,25 +107,49 @@
         </div>
 
         <!-- Links Grid -->
-        <div id="linksGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+        <div id="linksGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
             <!-- ข้อมูลจะแสดงตรงนี้ -->
         </div>
 
         <!-- Empty State -->
-        <div id="emptyState" class="hidden text-center py-32 bg-white/30 rounded-[3rem] border-2 border-dashed border-slate-300">
-            <div class="w-20 h-20 bg-slate-100 rounded-3xl flex items-center justify-center mx-auto mb-4">
-                <i data-lucide="layout-template" class="text-slate-300 w-10 h-10"></i>
+        <div id="emptyState" class="hidden text-center py-24 bg-white/30 rounded-[3rem] border-2 border-dashed border-slate-300">
+            <div class="w-16 h-16 bg-slate-100 rounded-3xl flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="layout-template" class="text-slate-300 w-8 h-8"></i>
             </div>
             <h3 class="text-slate-800 font-bold">ยังไม่มีลิงก์</h3>
-            <p class="text-slate-400 text-sm">กดปุ่ม + หรือใช้ปุ่มลัดเพื่อเพิ่มลิงก์</p>
+            <p class="text-slate-400 text-xs px-6">กดปุ่ม + หรือใช้ปุ่มลัดเพื่อเพิ่มลิงก์สำคัญของคุณ</p>
+        </div>
+
+        <!-- Mobile Guide Modal -->
+        <div id="mobileGuide" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
+            <div class="glass-panel w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl space-y-6">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-bold text-slate-900">วิธีใช้บนมือถือ</h3>
+                    <button onclick="hideMobileGuide()" class="text-slate-400"><i data-lucide="x"></i></button>
+                </div>
+                <div class="space-y-4 text-sm text-slate-600">
+                    <div class="flex gap-3">
+                        <div class="bg-blue-100 text-blue-600 w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-xs">1</div>
+                        <p><strong>เพิ่มแอปไว้ที่หน้าจอ:</strong> เปิดเมนูแชร์ใน Safari/Chrome แล้วเลือก <b>"Add to Home Screen"</b></p>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="bg-blue-100 text-blue-600 w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-xs">2</div>
+                        <p><strong>ใช้ปุ่มลัด:</strong> คัดลอกโค้ดด้านล่างไปสร้าง Bookmark ใหม่ แล้วกดใช้เมื่ออยู่ที่เว็บที่ต้องการบันทึก</p>
+                    </div>
+                    <button onclick="copyBookmarkletCode()" class="w-full py-3 bg-slate-100 rounded-xl text-xs font-bold text-slate-700 flex items-center justify-center gap-2 active:bg-blue-50">
+                        <i data-lucide="copy" size="14"></i> คัดลอกโค้ดปุ่มลัด
+                    </button>
+                </div>
+                <button onclick="hideMobileGuide()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold">รับทราบ</button>
+            </div>
         </div>
 
         <!-- Notification Toast -->
-        <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 glass-panel px-8 py-4 rounded-2xl border-blue-200 shadow-2xl flex items-center gap-3 hidden z-50 toast-animate">
-            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white">
+        <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 glass-panel px-6 py-4 rounded-2xl border-blue-200 shadow-2xl flex items-center gap-3 hidden z-50 toast-animate w-[90%] md:w-auto">
+            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white flex-shrink-0">
                 <i data-lucide="check" class="w-4 h-4"></i>
             </div>
-            <span id="toastMessage" class="font-bold text-slate-800 text-sm">เพิ่มสำเร็จ!</span>
+            <span id="toastMessage" class="font-bold text-slate-800 text-xs md:text-sm">เพิ่มสำเร็จ!</span>
         </div>
     </div>
 
@@ -132,24 +161,38 @@
         const emptyState = document.getElementById('emptyState');
         const searchInput = document.getElementById('searchInput');
 
-        // ฟังก์ชันจัดการ Bookmarklet
         function setupBookmarklet() {
             const currentUrl = window.location.href.split('?')[0];
             const code = `javascript:(function(){const t=encodeURIComponent(document.title);const u=encodeURIComponent(window.location.href);window.open('${currentUrl}?addTitle='+t+'&addUrl='+u,'_blank');})();`;
             document.getElementById('bookmarkletLink').href = code;
+            window.bookmarkletCode = code; // เก็บไว้สำหรับ Copy
         }
 
-        // ตรวจสอบ Parameter จาก URL เพื่อเพิ่มลิงก์อัตโนมัติ
+        function copyBookmarkletCode() {
+            const dummy = document.createElement('input');
+            document.body.appendChild(dummy);
+            dummy.value = window.bookmarkletCode;
+            dummy.select();
+            document.execCommand('copy');
+            document.body.removeChild(dummy);
+            showToast('คัดลอกโค้ดแล้ว! นำไปวางใน URL ของ Bookmark');
+        }
+
+        function showMobileGuide() {
+            document.getElementById('mobileGuide').classList.remove('hidden');
+        }
+
+        function hideMobileGuide() {
+            document.getElementById('mobileGuide').classList.add('hidden');
+        }
+
         function checkUrlParams() {
             const params = new URLSearchParams(window.location.search);
             const addTitle = params.get('addTitle');
             const addUrl = params.get('addUrl');
 
             if (addTitle && addUrl) {
-                // ล้าง Parameter เพื่อไม่ให้เพิ่มซ้ำเวลา Refresh
                 window.history.replaceState({}, document.title, window.location.pathname);
-                
-                // ตรวจสอบว่ามีลิงก์นี้อยู่แล้วหรือไม่
                 const exists = links.some(l => l.url === addUrl);
                 if (!exists) {
                     links.push({ title: decodeURIComponent(addTitle), url: decodeURIComponent(addUrl) });
@@ -195,25 +238,27 @@
 
             if (filteredLinks.length === 0) {
                 emptyState.classList.remove('hidden');
+                linksGrid.classList.add('hidden');
             } else {
                 emptyState.classList.add('hidden');
+                linksGrid.classList.remove('hidden');
                 filteredLinks.forEach((link, index) => {
                     const card = document.createElement('div');
-                    card.className = 'link-card group relative glass-panel p-6 rounded-[2.5rem] flex flex-col items-center gap-4 cursor-pointer';
+                    card.className = 'link-card group relative glass-panel p-4 md:p-6 rounded-[2.5rem] flex flex-col items-center gap-3 md:gap-4 cursor-pointer';
                     
                     const favicon = getFavicon(link.url);
                     
                     card.innerHTML = `
                         <div onclick="window.open('${link.url}', '_blank')" class="w-full flex flex-col items-center">
-                            <div class="icon-box w-20 h-20 rounded-3xl flex items-center justify-center mb-2 overflow-hidden border border-white shadow-sm transition-transform group-hover:scale-110">
-                                ${favicon ? `<img src="${favicon}" class="w-12 h-12 object-contain" onerror="this.src='https://api.dicebear.com/7.x/initials/svg?seed=${link.title}'">` : `<i data-lucide="globe" class="text-slate-300"></i>`}
+                            <div class="icon-box w-14 h-14 md:w-20 md:h-20 rounded-[1.5rem] md:rounded-3xl flex items-center justify-center mb-1 overflow-hidden border border-white shadow-sm transition-transform active:scale-95">
+                                ${favicon ? `<img src="${favicon}" class="w-8 h-8 md:w-12 md:h-12 object-contain" onerror="this.src='https://api.dicebear.com/7.x/initials/svg?seed=${link.title}'">` : `<i data-lucide="globe" class="text-slate-300"></i>`}
                             </div>
-                            <span class="font-bold text-slate-800 text-xs text-center truncate w-full">${link.title}</span>
-                            <span class="text-[9px] text-slate-400 font-medium truncate w-full text-center opacity-0 group-hover:opacity-100 transition-opacity">${new URL(link.url).hostname}</span>
+                            <span class="font-bold text-slate-800 text-[10px] md:text-xs text-center truncate w-full px-1">${link.title}</span>
+                            <span class="hidden md:block text-[9px] text-slate-400 font-medium truncate w-full text-center opacity-0 group-hover:opacity-100 transition-opacity">${new URL(link.url).hostname}</span>
                         </div>
                         
-                        <button onclick="deleteLink(${index})" class="absolute top-3 right-3 bg-red-50 text-red-500 p-2 rounded-xl opacity-0 group-hover:opacity-100 transition shadow-sm hover:bg-red-500 hover:text-white">
-                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        <button onclick="deleteLink(${index})" class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-50 text-red-500 p-2 rounded-xl opacity-0 group-hover:opacity-100 transition shadow-sm hover:bg-red-500 hover:text-white active:opacity-100">
+                            <i data-lucide="trash-2" class="w-3 md:w-3.5 h-3 md:h-3.5"></i>
                         </button>
                     `;
                     linksGrid.appendChild(card);
@@ -243,7 +288,6 @@
 
         searchInput.oninput = (e) => renderLinks(e.target.value);
 
-        // Initial setup
         window.onload = () => {
             setupBookmarklet();
             checkUrlParams();
