@@ -40,6 +40,11 @@
             to { transform: translateY(0); opacity: 1; }
         }
         .toast-animate { animation: slideUp 0.3s ease-out forwards; }
+
+        .tab-btn.active {
+            background-color: #1e293b;
+            color: white;
+        }
     </style>
 </head>
 <body class="p-4 md:p-12">
@@ -61,8 +66,8 @@
 
                 <!-- Mobile Instruction Button -->
                 <button onclick="showGuide()" class="flex items-center gap-2 px-4 py-4 rounded-2xl bg-white border border-slate-200 text-slate-600 text-xs font-bold shadow-sm hover:bg-slate-50 transition-all">
-                    <i data-lucide="smartphone"></i>
-                    วิธีทำปุ่มลัดมือถือ
+                    <i data-lucide="help-circle"></i>
+                    วิธีเข้าหน้า Hub ง่ายๆ
                 </button>
 
                 <div class="relative flex-1 md:w-64">
@@ -117,31 +122,65 @@
         <div id="guideModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[60] hidden flex items-center justify-center p-4">
             <div class="glass-panel w-full max-w-lg rounded-[2.5rem] p-6 md:p-10 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
                 <div class="flex justify-between items-center border-b border-slate-100 pb-4">
-                    <h3 class="font-black text-slate-900 text-lg uppercase tracking-tight">วิธีทำ "ปุ่มกดเซฟ" บนมือถือ</h3>
+                    <h3 class="font-black text-slate-900 text-lg uppercase tracking-tight">วิธีใช้งานให้สะดวกรวดเร็ว</h3>
                     <button onclick="hideGuide()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x"></i></button>
                 </div>
+
+                <!-- Tabs -->
+                <div class="flex bg-slate-100 p-1 rounded-xl">
+                    <button onclick="setTab('pc')" id="tab-pc" class="tab-btn active flex-1 py-2 text-xs font-bold rounded-lg transition-all">คอมพิวเตอร์ (PC)</button>
+                    <button onclick="setTab('mobile')" id="tab-mobile" class="tab-btn flex-1 py-2 text-xs font-bold rounded-lg transition-all">มือถือ (Mobile)</button>
+                </div>
                 
-                <div class="space-y-6">
+                <!-- PC Content -->
+                <div id="content-pc" class="space-y-6">
                     <div class="flex gap-4">
-                        <div class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-black">1</div>
-                        <p class="text-sm text-slate-600 leading-relaxed pt-1">เพิ่ม <b>Bookmark</b> หน้าเว็บนี้ลงในมือถือของคุณก่อน (ตั้งชื่อว่า "เซฟเข้า Hub")</p>
+                        <div class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-black italic">!</div>
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-slate-800">ทำให้เป็นแอปบนคอม (แนะนำ)</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">ไปที่เมนู 3 จุดของเบราว์เซอร์ (Chrome/Edge) > เลือก <b>"บันทึกและแชร์"</b> > <b>"ติดตั้งหน้านี้เป็นแอป"</b> คุณจะได้ไอคอนที่ Taskbar เหมือนโปรแกรมในเครื่องเลยครับ</p>
+                        </div>
                     </div>
                     <div class="flex gap-4">
-                        <div class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-black">2</div>
+                        <div class="flex-shrink-0 w-8 h-8 bg-slate-800 text-white rounded-full flex items-center justify-center font-black">1</div>
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-slate-800">ทำ Bookmark มาตรฐาน</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">กด <b>Ctrl + D</b> เพื่อเก็บหน้านี้ไว้ในแถบบุ๊กมาร์กบนสุด</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="flex-shrink-0 w-8 h-8 bg-slate-800 text-white rounded-full flex items-center justify-center font-black">2</div>
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-slate-800">ใช้ปุ่มลัดสำหรับเซฟเว็บ</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">ลากปุ่ม <b>"ลากปุ่มลัด (PC)"</b> ด้านบนไปวางที่แถบบุ๊กมาร์ก เพื่อใช้กดบันทึกเว็บอื่นขณะใช้งาน</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile Content (Hidden by default) -->
+                <div id="content-mobile" class="hidden space-y-6">
+                    <div class="flex gap-4">
+                        <div class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-black italic">!</div>
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-slate-800">นำไปไว้หน้าจอโฮม</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">เปิดหน้านี้ใน Safari/Chrome มือถือ > กดปุ่มแชร์ > เลือก <b>"Add to Home Screen"</b></p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="flex-shrink-0 w-8 h-8 bg-slate-800 text-white rounded-full flex items-center justify-center font-black">1</div>
+                        <p class="text-sm text-slate-600 leading-relaxed pt-1">เพิ่ม <b>Bookmark</b> หน้านี้ลงในมือถือ (ตั้งชื่อว่า "เซฟเข้า Hub")</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="flex-shrink-0 w-8 h-8 bg-slate-800 text-white rounded-full flex items-center justify-center font-black">2</div>
                         <div class="w-full space-y-3">
-                            <p class="text-sm text-slate-600">กดปุ่มสีดำด้านล่างเพื่อคัดลอก "โค้ดคำสั่ง"</p>
                             <button onclick="copyCode()" class="w-full py-4 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase flex items-center justify-center gap-2 active:scale-95 transition-all shadow-xl">
-                                <i data-lucide="copy" size="16"></i> คัดลอกโค้ดคำสั่ง
+                                <i data-lucide="copy" size="16"></i> คัดลอกโค้ดรีโมท
                             </button>
                         </div>
                     </div>
                     <div class="flex gap-4">
-                        <div class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-black">3</div>
-                        <p class="text-sm text-slate-600 leading-relaxed pt-1">ไปที่ <b>เมนูแก้ไข Bookmark</b> ที่เพิ่งทำ ลบ URL เดิมออก แล้ว <b>"วาง (Paste)"</b> โค้ดที่คัดลอกมาลงไปแทน</p>
-                    </div>
-                    
-                    <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100 text-blue-700 text-xs leading-relaxed">
-                        <b>เรียบร้อย!</b> คราวนี้เวลาเข้าเว็บไหนแล้วอยากเซฟ ให้กดที่ Bookmark "เซฟเข้า Hub" ลิงก์จะบินกลับมาเก็บที่นี่ทันที
+                        <div class="flex-shrink-0 w-8 h-8 bg-slate-800 text-white rounded-full flex items-center justify-center font-black">3</div>
+                        <p class="text-sm text-slate-600 leading-relaxed pt-1">ไปที่ <b>แก้ไข Bookmark</b> ลบ URL เดิมออก แล้ว <b>"วาง"</b> โค้ดที่ก๊อปมาลงไปแทน</p>
                     </div>
                 </div>
 
@@ -275,6 +314,27 @@
         };
 
         searchInput.oninput = renderLinks;
+        
+        // Tab switching logic
+        window.setTab = (tab) => {
+            const pcBtn = document.getElementById('tab-pc');
+            const mobileBtn = document.getElementById('tab-mobile');
+            const pcContent = document.getElementById('content-pc');
+            const mobileContent = document.getElementById('content-mobile');
+
+            if (tab === 'pc') {
+                pcBtn.classList.add('active');
+                mobileBtn.classList.remove('active');
+                pcContent.classList.remove('hidden');
+                mobileContent.classList.add('hidden');
+            } else {
+                mobileBtn.classList.add('active');
+                pcBtn.classList.remove('active');
+                mobileContent.classList.remove('hidden');
+                pcContent.classList.add('hidden');
+            }
+        };
+
         window.showGuide = () => document.getElementById('guideModal').classList.remove('hidden');
         window.hideGuide = () => document.getElementById('guideModal').classList.add('hidden');
 
