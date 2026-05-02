@@ -34,6 +34,13 @@
         }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        /* Animation for auto-add toast */
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .toast-animate { animation: slideUp 0.5s ease-out forwards; }
     </style>
 </head>
 <body class="p-4 md:p-12">
@@ -53,8 +60,14 @@
                 <p class="text-slate-500 text-sm font-medium">รวมทางลัดการทำงานของคุณไว้ในที่เดียว</p>
             </div>
             
-            <div class="flex items-center gap-3 w-full md:w-auto">
-                <div class="relative flex-1 md:w-80">
+            <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                <!-- Bookmarklet Button -->
+                <a id="bookmarkletLink" href="#" class="hidden md:flex items-center gap-2 px-4 py-4 rounded-2xl bg-white border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 transition-all cursor-move shadow-sm" title="ลากปุ่มนี้ไปไว้ที่แถบบุ๊กมาร์ก (Bookmarks Bar)">
+                    <i data-lucide="bookmark"></i>
+                    ลากเพื่อติดตั้งปุ่มลัด
+                </a>
+
+                <div class="relative flex-1 md:w-64">
                     <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4"></i>
                     <input type="text" id="searchInput" placeholder="ค้นหาลิงก์..." 
                         class="w-full pl-12 pr-4 py-4 rounded-2xl glass-panel border-none shadow-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all">
@@ -99,7 +112,15 @@
                 <i data-lucide="layout-template" class="text-slate-300 w-10 h-10"></i>
             </div>
             <h3 class="text-slate-800 font-bold">ยังไม่มีลิงก์</h3>
-            <p class="text-slate-400 text-sm">กดปุ่ม + เพื่อเพิ่มทางลัดแรกของคุณ</p>
+            <p class="text-slate-400 text-sm">กดปุ่ม + หรือใช้ปุ่มลัดเพื่อเพิ่มลิงก์</p>
+        </div>
+
+        <!-- Notification Toast -->
+        <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 glass-panel px-8 py-4 rounded-2xl border-blue-200 shadow-2xl flex items-center gap-3 hidden z-50 toast-animate">
+            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white">
+                <i data-lucide="check" class="w-4 h-4"></i>
+            </div>
+            <span id="toastMessage" class="font-bold text-slate-800 text-sm">เพิ่มสำเร็จ!</span>
         </div>
     </div>
 
@@ -110,6 +131,42 @@
         const linksGrid = document.getElementById('linksGrid');
         const emptyState = document.getElementById('emptyState');
         const searchInput = document.getElementById('searchInput');
+
+        // ฟังก์ชันจัดการ Bookmarklet
+        function setupBookmarklet() {
+            const currentUrl = window.location.href.split('?')[0];
+            const code = `javascript:(function(){const t=encodeURIComponent(document.title);const u=encodeURIComponent(window.location.href);window.open('${currentUrl}?addTitle='+t+'&addUrl='+u,'_blank');})();`;
+            document.getElementById('bookmarkletLink').href = code;
+        }
+
+        // ตรวจสอบ Parameter จาก URL เพื่อเพิ่มลิงก์อัตโนมัติ
+        function checkUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            const addTitle = params.get('addTitle');
+            const addUrl = params.get('addUrl');
+
+            if (addTitle && addUrl) {
+                // ล้าง Parameter เพื่อไม่ให้เพิ่มซ้ำเวลา Refresh
+                window.history.replaceState({}, document.title, window.location.pathname);
+                
+                // ตรวจสอบว่ามีลิงก์นี้อยู่แล้วหรือไม่
+                const exists = links.some(l => l.url === addUrl);
+                if (!exists) {
+                    links.push({ title: decodeURIComponent(addTitle), url: decodeURIComponent(addUrl) });
+                    saveLinks();
+                    showToast(`เพิ่ม "${decodeURIComponent(addTitle)}" เรียบร้อยแล้ว!`);
+                } else {
+                    showToast('ลิงก์นี้มีอยู่แล้ว');
+                }
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').innerText = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
 
         function toggleAddForm() {
             const isHidden = addFormContainer.classList.contains('hidden');
@@ -174,6 +231,7 @@
             linkForm.reset();
             toggleAddForm();
             saveLinks();
+            showToast('บันทึกสำเร็จ');
         };
 
         window.deleteLink = (index) => {
@@ -185,8 +243,13 @@
 
         searchInput.oninput = (e) => renderLinks(e.target.value);
 
-        renderLinks();
-        lucide.createIcons();
+        // Initial setup
+        window.onload = () => {
+            setupBookmarklet();
+            checkUrlParams();
+            renderLinks();
+            lucide.createIcons();
+        };
     </script>
 </body>
 </html>
