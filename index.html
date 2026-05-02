@@ -53,10 +53,16 @@
             </div>
             
             <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                <!-- Instruction Button -->
+                <!-- PC Bookmarklet (Drag Button) -->
+                <a id="bookmarkletLink" href="#" class="hidden lg:flex items-center gap-2 px-4 py-4 rounded-2xl bg-white border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 transition-all cursor-move shadow-sm" title="ลากปุ่มนี้ไปไว้ที่แถบบุ๊กมาร์ก (Bookmarks Bar) ของคอมพิวเตอร์">
+                    <i data-lucide="mouse-pointer-2"></i>
+                    ลากปุ่มลัด (PC)
+                </a>
+
+                <!-- Mobile Instruction Button -->
                 <button onclick="showGuide()" class="flex items-center gap-2 px-4 py-4 rounded-2xl bg-white border border-slate-200 text-slate-600 text-xs font-bold shadow-sm hover:bg-slate-50 transition-all">
-                    <i data-lucide="help-circle"></i>
-                    วิธีทำปุ่มลัด
+                    <i data-lucide="smartphone"></i>
+                    วิธีทำปุ่มลัดมือถือ
                 </button>
 
                 <div class="relative flex-1 md:w-64">
@@ -104,7 +110,7 @@
                 <i data-lucide="layout-template" class="text-slate-300 w-8 h-8"></i>
             </div>
             <h3 class="text-slate-800 font-bold">ยังไม่มีข้อมูล</h3>
-            <p class="text-slate-400 text-xs px-6">กดปุ่ม + เพื่อเพิ่มลิงก์ หรือดูวิธีใช้ปุ่มลัดด้านบน</p>
+            <p class="text-slate-400 text-xs px-6">กดปุ่ม + เพื่อเพิ่มลิงก์ หรือติดตั้งปุ่มลัดเพื่อเซฟจากหน้าอื่น</p>
         </div>
 
         <!-- Guide Modal -->
@@ -124,7 +130,7 @@
                         <div class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-black">2</div>
                         <div class="w-full space-y-3">
                             <p class="text-sm text-slate-600">กดปุ่มสีดำด้านล่างเพื่อคัดลอก "โค้ดคำสั่ง"</p>
-                            <button onclick="copyCode()" class="w-full py-4 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase flex items-center justify-center gap-2 active:scale-95 transition-all">
+                            <button onclick="copyCode()" class="w-full py-4 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase flex items-center justify-center gap-2 active:scale-95 transition-all shadow-xl">
                                 <i data-lucide="copy" size="16"></i> คัดลอกโค้ดคำสั่ง
                             </button>
                         </div>
@@ -220,7 +226,10 @@
 
         function updateBookmarklet() {
             const currentUrl = window.location.href.split('?')[0];
-            window.bookmarkCode = `javascript:(function(){const t=encodeURIComponent(document.title);const u=encodeURIComponent(window.location.href);window.open('${currentUrl}?addTitle='+t+'&addUrl='+u,'_blank');})();`;
+            const code = `javascript:(function(){const t=encodeURIComponent(document.title);const u=encodeURIComponent(window.location.href);window.open('${currentUrl}?addTitle='+t+'&addUrl='+u,'_blank');})();`;
+            window.bookmarkCode = code;
+            const bLink = document.getElementById('bookmarkletLink');
+            if (bLink) bLink.href = code;
         }
 
         function copyCode() {
